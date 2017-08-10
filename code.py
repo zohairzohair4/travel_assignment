@@ -2,11 +2,6 @@ import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import sys
 
-logs = pd.read_csv(sys.argv[1])
-#logs = pd.read_csv(r'C:\Users\Administrator\Desktop\travel audience assignment\logs.csv')
-logs['ts'] = pd.to_datetime(logs['ts'])
-logs = logs[['uuid','ts']]
-
 
 def multiple_days_uuid(log):
     x =log.ix[(logs.duplicated('uuid',keep =False))] # not unique uuid
