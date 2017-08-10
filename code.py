@@ -65,9 +65,9 @@ def main():
     
     final_logs.to_csv(path_or_buf= sys.argv[2], index = False) # save csv
     
-    '''
-    final_logs.ix[final_logs['multiple_days'] == 1].shape  # total ones in multiple_days 36035
-    final_logs.ix[final_logs['weekday_biz'] == 1].shape   # total ones in weekday_biz 90868
-    '''
+    
+    #final_logs.ix[final_logs['multiple_days'] == 1].shape  # total ones in multiple_days 36035
+    #final_logs.ix[final_logs['weekday_biz'] == 1].shape   # total ones in weekday_biz 90868
+    
 if __name__ == "__main__":
     main()    
