@@ -18,7 +18,7 @@ def multiple_days_uuid(log):
     multiple_days = x['uuid']  
     x['multiple_days'] = np.ones(multiple_days.shape)  #assign one to all uuid
     x.drop(['dom'], axis=1, inplace=True)  # drop day of month
-    x = x.drop_duplicates() # drop multiple uuids
+    x = x.drop_duplicates() # drop multiple uuids with same multiple_days flag
     return x
 
 def week_days_uuid(log):
@@ -39,21 +39,35 @@ def get_count(logs):
     third = np.array(third)
     return third
 
-first = multiple_days_uuid(logs) # first feature
-sedond = week_days_uuid(logs) # second feature
-third = get_count(logs)
-
-different_or_weekday = pd.merge(first, sedond,  how='outer', left_on=['uuid'], right_on =['uuid'] ) # have different day or weekday
-different_or_weekday = different_or_weekday.fillna(0)
-different_and_weekday = pd.merge(first, sedond,  how='inner', left_on=['uuid'], right_on =['uuid'] ) # have different day and weekday
-
-logs = logs[['uuid']]
-logs = logs.drop_duplicates() # get orignal list of uuid
 
 
-final_logs = pd.merge(logs, different_or_weekday,  how='outer', left_on=['uuid'], right_on =['uuid'] ) 
-final_logs = final_logs.fillna(0)
-final_logs = final_logs.sort_values(by='uuid') # sort coz we have to add thrid according to uuid
-final_logs['count'] = third
+def main():
+    
+    logs = pd.read_csv(sys.argv[1])
+    logs['ts'] = pd.to_datetime(logs['ts'])
+    logs = logs[['uuid','ts']]
 
-final_logs.to_csv(path_or_buf= sys.argv[2], index = False)
+    first = multiple_days_uuid(logs) # first feature
+    sedond = week_days_uuid(logs) # second feature
+    third = get_count(logs) # third feature
+    
+    multiple_days_or_weekday = pd.merge(first, sedond,  how='outer', left_on=['uuid'], right_on =['uuid'] ) # have different day or weekday
+    multiple_days_or_weekday = multiple_days_or_weekday.fillna(0)
+    
+    logs = logs[['uuid']]
+    logs = logs.drop_duplicates() # get orignal list of uuid
+    
+    
+    final_logs = pd.merge(logs, multiple_days_or_weekday,  how='outer', left_on=['uuid'], right_on =['uuid'] ) 
+    final_logs = final_logs.fillna(0)
+    final_logs = final_logs.sort_values(by='uuid') # sort coz we have to add thrid according to uuid
+    final_logs['count'] = third
+    
+    final_logs.to_csv(path_or_buf= sys.argv[2], index = False) # save csv
+    
+    '''
+    final_logs.ix[final_logs['multiple_days'] == 1].shape  # total ones in multiple_days 36035
+    final_logs.ix[final_logs['weekday_biz'] == 1].shape   # total ones in weekday_biz 90868
+    '''
+if __name__ == "__main__":
+    main()    
